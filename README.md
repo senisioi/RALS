@@ -2,8 +2,9 @@
 
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-blue.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Paper](https://img.shields.io/badge/paper-ACL--style-orange)](https://aclanthology.org/2025.emnlp-main.1603/)
-![Language](https://img.shields.io/badge/language-Romanian-red)
-![Dataset Status](https://img.shields.io/badge/dataset-released-green)
+[![Dataset Status](https://img.shields.io/badge/dataset-released-green)](https://github.com/senisioi/RALS/raw/refs/heads/main/data.zip)
+[![Language](https://img.shields.io/badge/language-Romanian-red)]()
+
 
 
 This repository accompanies the paper "RALS: Resources and Baselines for Romanian Automatic Lexical Simplification", which introduces the first set of resources and baseline systems for Lexical Complexity Prediction (LCP) and Lexical Simplification (LS) in Romanian.
@@ -42,7 +43,7 @@ The word translation (WT) sentence selection process is in an unstructured form 
 
 ## DexFlex 
 
-[DexFlex](https://github.com/PetruTH/DexFlex) is a Python package for Romanian language processing.  
+[DexFlex](https://github.com/PetruTH/DexFlex) is a Python package for Romanian language processing.
 It leverages [dexonline](https://github.com/dexonline/dexonline) to extract dictionary data, applies rule-based methods, and integrates **spaCy** with the Romanian model [`ro_core_news_lg`](https://spacy.io/models/ro).  
 The library provides functionality such as inflection handling, synonym suggestions, and transformations between tenses and voices.
 
@@ -54,6 +55,56 @@ The system is rule based and has the following steps:
 4. Inflects synonyms correctly to match Romanian grammar.  
 5. Ranks candidates using LCP scores.
 
+To test the package, try:
+
+```bash
+pip install dexflex
+```
+
+```python
+from dexflex.prototype import *
+# ! when running this for the first time
+# it will download the dictionary data ~1GB
+# in the location where the script is run
+
+import spacy
+
+nlp = spacy.load("ro_core_news_lg")
+
+samples = [
+    ("Am observat eroarea la timp.", 2),
+    ("Ea a învățat să cânte la pian.", 4),
+    ("Am observat eroarea la timp.", 1),
+    ("Ei au reparat mașina stricată.", -2),
+    ("Tu ai scris o poezie frumoasă.", -2),
+    ("Ea s-a gătit pentru o cină delicioasă.", 3),
+    ("El a uitat să aducă documentele.", -2),
+    ("Ea a primit un cadou de ziua ei.", 4),
+    ("Tu ai vorbit cu profesorul?", -2),
+    ("Ei au construit un parc nou.", 2),
+    ("El a plecat la camera lui.", -3)
+]
+
+for sample in samples:
+    doc = nlp(sample[0])
+    syn_list = [syn[0] for syn in doc[sample[1]]._.get_syns()]
+    print(f"Synonyms for: {doc[sample[1]]} are {syn_list}")
+
+
+```
+```
+Synonyms for: eroarea are ['eroarea', 'lipsa', 'greșeala', 'rătăcirea', 'necinstea', 'înșelătoria', 'incorecțiunea', 'neregula', 'inexactitatea', 'șarlatania']
+Synonyms for: cânte are ['cânte', 'execute', 'doinească', 'sune', 'horească', 'răsune', 'intoneze', 'fredoneze']
+Synonyms for: observat are ['văzut', 'observat', 'surprins', 'prins', 'simțit', 'constatat', 'aflat', 'privit', 'sesizat', 'priceput']
+Synonyms for: stricată are ['stricată', 'vicioasă', 'spartă', 'uzată', 'primejduită', 'degradată', 'zdrobită', 'atinsă', 'deformată', 'alterată']
+Synonyms for: frumoasă are ['frumoasă', 'arătoasă', 'frumoaso', 'chipoasă', 'aleasă', 'distinsă', 'drăguță', 'minunată', 'aspectuoasă', 'strașnică']
+Synonyms for: gătit are ['gătit', 'dichisit', 'ferchezuit', 'sclivisit', 'înfrumusețat', 'înzorzonat', 'împopoțat', 'înțoțonat', 'împoponat', 'zorzonat']
+Synonyms for: documentele are ['actele', 'documentele', 'izvoarele', 'textele', 'înscrisurile', 'zapisele', 'hrisoavele', 'titlurile', 'terfeloagele']
+Synonyms for: cadou are ['dar', 'plocon', 'omagiu']
+Synonyms for: profesorul are ['profesorul', 'dascălul', 'profesoru', 'dascălu', 'dăscălașul', 'dăscălașu', 'pedagogul', 'pedagogu', 'profesorașul', 'profesorașu']
+Synonyms for: construit are ['făcut', 'clădit', 'construit', 'temeiat', 'compus', 'edificat', 'constituit', 'întemeiat', 'conceput', 'creat']
+Synonyms for: camera are ['camera', 'odaia', 'cuhnia', 'încăperea']
+```
 
 
 ## Lexical Simplification & DexFlex & GPT-4o
